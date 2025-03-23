@@ -94,4 +94,13 @@ async def on_message(message):
 threading.Thread(target=run_flask, daemon=True).start()
 
 # Запуск бота
+@bot.event
+async def on_ready():
+    guild = discord.utils.get(bot.guilds, id=GUILD_ID)
+    if guild:
+        print(f'Successfully connected to {guild.name} ({guild.id})')
+    else:
+        print(f"Bot is not in the specified server with ID {GUILD_ID}. Disconnecting...")
+        await bot.close()  # Отключаем бота, если он не в нужном сервере
+        
 bot.run(TOKEN)
