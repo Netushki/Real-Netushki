@@ -8,9 +8,6 @@ import re
 
 # Получаем токен из переменных окружения
 TOKEN = os.getenv("TOKEN")
-if not TOKEN:
-    print("Error: The TOKEN environment variable is not set!")
-    exit(1)
 
 # Идентификатор сервера и каналов
 GUILD_ID = 1185300118518378506  # Target server ID
@@ -92,11 +89,6 @@ async def on_message(message):
 
     # Обработка команд
     await bot.process_commands(message)
-
-# Команда для проверки работы бота
-@bot.command()
-async def ping(ctx):
-    await ctx.send("Pong!")
 
 # Запуск Flask в отдельном потоке
 threading.Thread(target=run_flask, daemon=True).start()
