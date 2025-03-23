@@ -62,6 +62,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
+    # Отвечаем GIF, если бот был упомянут
     if bot.user in message.mentions and message.reference is None:
         response_gif = random.choice(gif_urls)  # Выбираем один случайный GIF
         await message.reply(response_gif)
@@ -96,4 +97,5 @@ threading.Thread(target=run_flask, daemon=True).start()
 
 # Запуск бота
 bot.run(TOKEN)
+
 
