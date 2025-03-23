@@ -1,20 +1,26 @@
 import discord
 import os
 import random
+from discord.ext import commands
 from flask import Flask
 import threading
 import re
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+# Получаем токен из переменных окружения
+TOKEN = os.getenv("TOKEN")
+if not TOKEN:
+    print("Error: The TOKEN environment variable is not set!")
+    exit(1)
+
+# Идентификатор сервера и каналов
 GUILD_ID = 1185300118518378506  # Target server ID
 COUNTING_CHANNEL_ID = 1344299177386967120  # Канал считалки
 SCREENSHOT_CHANNEL_ID = 1344388680953106512  # Канал скриншотов
 
-
-# Set up the bot client
+# Создаем объект для бота с необходимыми интентами
 intents = discord.Intents.default()
 intents.messages = True
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Flask app
 app = Flask(__name__)
@@ -26,6 +32,7 @@ def home():
 def run_flask():
     app.run(host="0.0.0.0", port=10000)
 
+# Список URL для GIF
 gif_urls = [
     "https://cdn.discordapp.com/attachments/1346943612373569557/1347573414142939279/attachment.gif",
     "https://cdn.discordapp.com/attachments/1322781202851041358/1347037669388980274/attachment.gif",
@@ -42,15 +49,27 @@ gif_urls = [
 def find_numbers(text):
     return [int(num) for num in re.findall(r'\b\d+\b', text)]  # Ищет все числа в тексте
 
-# Проверка сообщений в канале считалки
-@client.event
+# Событие, когда бот подключается
+@bot.event
+async def on_ready():
+    guild = discord.utils.get(bot.guilds, id=GUILD_ID)
+    if guild:
+        print(f'Successfully connected to {guild.name} ({guild.id})')
+    else:
+        print("Bot is not in the specified server.")
+
+# Обработчик сообщений
+@bot.event
 async def on_message(message):
     if message.author.bot:
         return
-    if client.user in message.mentions and message.reference is None:
-        response_gif = random.choice(gif_urls)  # Select one random GIF
+
+    if bot.user in message.mentions and message.reference is None:
+        response_gif = random.choice(gif_urls)  # Выбираем один случайный GIF
         await message.reply(response_gif)
         return
+
+    # Проверка сообщений в канале считалки
     if message.channel.id == COUNTING_CHANNEL_ID:
         numbers_in_message = find_numbers(message.content)
         if not numbers_in_message:
@@ -60,6 +79,8 @@ async def on_message(message):
             )
             await warning.delete(delay=3)
             return
+
+    # Проверка сообщений в канале для скриншотов
     if message.channel.id == SCREENSHOT_CHANNEL_ID:
         if not message.attachments:
             await message.delete()
@@ -68,10 +89,17 @@ async def on_message(message):
             )
             await warning.delete(delay=3)
             return
-    await client.process_commands(message)
 
-# Run Flask in a separate thread
+    # Обработка команд
+    await bot.process_commands(message)
+
+# Команда для проверки работы бота
+@bot.command()
+async def ping(ctx):
+    await ctx.send("Pong!")
+
+# Запуск Flask в отдельном потоке
 threading.Thread(target=run_flask, daemon=True).start()
 
-# Run the bot
-client.run(TOKEN)
+# Запуск бота
+bot.run(TOKEN)
