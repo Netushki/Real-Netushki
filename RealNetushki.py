@@ -53,8 +53,7 @@ async def on_ready():
     if guild:
         print(f'Successfully connected to {guild.name} ({guild.id})')
     else:
-        print(f"Bot is not in the specified server with ID {GUILD_ID}. Disconnecting...")
-        await bot.close()  # Отключаем бота, если он не в нужном сервере
+        print("Bot is not in the specified server.")
 
 # Обработчик сообщений
 @bot.event
@@ -62,7 +61,6 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Отвечаем GIF, если бот был упомянут
     if bot.user in message.mentions and message.reference is None:
         response_gif = random.choice(gif_urls)  # Выбираем один случайный GIF
         await message.reply(response_gif)
@@ -96,6 +94,16 @@ async def on_message(message):
 threading.Thread(target=run_flask, daemon=True).start()
 
 # Запуск бота
+@bot.event
+async def on_ready():
+    guild = discord.utils.get(bot.guilds, id=GUILD_ID)
+    if guild:
+        print(f'Successfully connected to {guild.name} ({guild.id})')
+    else:
+        print(f"Bot is not in the specified server with ID {GUILD_ID}. Disconnecting...")
+        await bot.close()  # Отключаем бота, если он не в нужном сервере
+        
 bot.run(TOKEN)
+
 
 
