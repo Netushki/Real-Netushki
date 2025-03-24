@@ -48,14 +48,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 def find_numbers(text):
     return re.findall(r'\b\d+\b', text)  # Ищет числа в тексте
 
-# Функция для получения последнего числа в канале считалки
-async def get_last_number(channel):
-    async for message in channel.history(limit=10):  # Ищем последние 10 сообщений
-        numbers = find_numbers(message.content)
-        if numbers:
-            return int(numbers[-1])  # Берем последнее число
-    return None
-
+# Обработчик сообщений
 @bot.event
 async def on_message(message):
     try:
@@ -78,17 +71,6 @@ async def on_message(message):
                 )
                 await warning.delete(delay=3)
                 return
-
-            last_number = await get_last_number(message.channel)
-            if last_number is not None:
-                expected_number = last_number + 1
-                if numbers_in_message[0] != expected_number:
-                    await message.delete()
-                    warning = await message.channel.send(
-                        f"{message.author.mention}, следующее число должно быть **{expected_number}**!"
-                    )
-                    await warning.delete(delay=3)
-                    return
 
         # Проверка сообщений в канале для скриншотов
         if message.channel.id == SCREENSHOT_CHANNEL_ID:
@@ -119,6 +101,7 @@ async def on_ready():
         await bot.close()  # Отключаем бота, если он не в нужном сервере
 
 bot.run(TOKEN)
+
 
 
 
