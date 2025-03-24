@@ -6,8 +6,10 @@ from flask import Flask
 import threading
 import re
 
+# Получаем токен из переменных окружения
 TOKEN = os.getenv("TOKEN")
 
+# Идентификатор сервера и каналов
 GUILD_ID = 1185300118518378506  # ID сервера
 COUNTING_CHANNEL_ID = 1344299177386967120  # Канал считалки
 SCREENSHOT_CHANNEL_ID = 1344384380953106512  # Канал скриншотов
@@ -25,6 +27,17 @@ gif_urls = [
     "https://cdn.discordapp.com/attachments/1207730830487855154/1348367459392159744/attachment.gif?ex=67d12ecd&is=67cfdd4d&hm=225d51cec802d84090335c6ccbc92ceccfeac3cedd8b946198054399f40c4e45&",
 ]
 
+# Flask app
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+def run_flask():
+    app.run(host="0.0.0.0", port=10000)
+
+# Создаем объект для бота с необходимыми интентами
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True  # Для доступа к содержимому сообщений
@@ -92,7 +105,21 @@ async def on_message(message):
     except Exception as e:
         print(f"Ошибка в on_message: {e}")
 
+# Запуск Flask в отдельном потоке
+threading.Thread(target=run_flask, daemon=True).start()
+
+# Запуск бота
+@bot.event
+async def on_ready():
+    guild = discord.utils.get(bot.guilds, id=GUILD_ID)
+    if guild:
+        print(f'Successfully connected to {guild.name} ({guild.id})')
+    else:
+        print(f"Bot is not in the specified server with ID {GUILD_ID}. Disconnecting...")
+        await bot.close()  # Отключаем бота, если он не в нужном сервере
+
 bot.run(TOKEN)
+
 
 
 
