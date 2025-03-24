@@ -1,6 +1,5 @@
 import discord
 import os
-import random
 from discord.ext import commands
 from flask import Flask
 import threading
@@ -81,6 +80,7 @@ async def on_message(message):
 threading.Thread(target=run_flask, daemon=True).start()
 
 bot.run(TOKEN)
+
 
 
 
