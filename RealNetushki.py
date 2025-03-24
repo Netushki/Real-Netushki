@@ -41,7 +41,6 @@ gif_urls = [
     "https://media.discordapp.net/attachments/1055080776808546353/1177601225542352927/attachment.gif",
     "https://cdn.discordapp.com/attachments/1207730830487855154/1348367007401115658/attachment.gif",
     "https://cdn.discordapp.com/attachments/1207730830487855154/1348366855894470697/attachment.gif",
-    "https://cdn.jacher.io/f3ac073b88487e1b.gif",
     "https://cdn.discordapp.com/attachments/1207730830487855154/1348367459392159744/attachment.gif",
 ]
 
